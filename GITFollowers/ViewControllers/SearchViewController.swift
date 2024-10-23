@@ -20,6 +20,7 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        searchTextField.text = "sallen0400"
         configureLogoView()
         configureSearchTextField()
         configureGetFollowersButton()
