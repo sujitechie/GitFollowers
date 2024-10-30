@@ -33,7 +33,7 @@ class GFImageView: UIImageView {
         
         let cacheKey = NSString(string: urlString)
         if let image = cache.object(forKey: cacheKey) {
-            print("fetching image from cache")
+            //print("fetching image from cache")
             self.image = image
             return
         }
@@ -53,7 +53,7 @@ class GFImageView: UIImageView {
             }
             
         }
-        print("downloading Image")
+        //print("downloading Image")
         downloadTask.resume()
     }
     
