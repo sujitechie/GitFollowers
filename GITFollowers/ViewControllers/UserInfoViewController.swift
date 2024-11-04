@@ -19,6 +19,8 @@ class UserInfoViewController: UIViewController {
     let itemViewOne: UIView = UIView()
     let itemViewTwo: UIView = UIView()
     let dateLabel = GFBodyLabel(textAlignment: .center)
+    
+    weak var delegate: FollowersListVCDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,6 +116,13 @@ extension UserInfoViewController: UserInfoVCDelegate {
     }
     
     func didTapGetFollowers(user: User) {
-        print("didTapGetFollowers")
+        guard user.followers != 0 else {
+            presentAlertVCOnMainThread(alertTitle: "No Followers", alertBody: "This user have no followers.", buttonTitle: "OK")
+            return
+        }
+        delegate?.didRequestFollowers(username: user.login)
+        dismissVC()
     }
 }
+
+
