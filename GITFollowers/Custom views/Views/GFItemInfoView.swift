@@ -27,8 +27,8 @@ class GFItemInfoView: UIView {
     }
     
     private func layoutUI() {
-        let views = [symbolImageView, titleLabel, countLabel]
-        addSubViews(to: self, subviews: views)
+
+        addSubviews(symbolImageView, titleLabel, countLabel)
                 
         NSLayoutConstraint.activate([
             symbolImageView.topAnchor.constraint(equalTo: topAnchor),

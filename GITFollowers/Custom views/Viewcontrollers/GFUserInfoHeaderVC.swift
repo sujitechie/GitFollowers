@@ -35,16 +35,22 @@ class GFUserInfoHeaderVC: UIViewController {
     }
     
     func configureViews() {
-        avatarImageView.image = UIImage(named: "avatar-placeholder")
+        avatarImageView.image = Images.placeholder
         nameLabel.text = "sujith"
         usernameLabel.text = "sujitechie"
         locationLabel.text = "IN"
         bioLabel.text = "nsinfi inuinu u siupi fd iusdo ifbu iusd iouf suidfi sduhf soid jfpoa ijairo oohsoif."
-        locationImageView.image = UIImage(named: "avatar-placeholder")
+        locationImageView.image = Images.placeholder
     }
     
     func configureUIElements() {
-        avatarImageView.downloadImage(from: user.avatarUrl)
+        NetworkManager.shared.downloadImage(from: user.avatarUrl) { [weak self] image in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.avatarImageView.image = image
+            }
+        }
+        
         nameLabel.text = user.name ?? ""
         usernameLabel.text = user.login
         locationLabel.text = user.location
@@ -61,8 +67,7 @@ class GFUserInfoHeaderVC: UIViewController {
     func layoutUI() {
 
         let locationView = UIView()
-        let locationViews = [locationImageView, locationLabel]
-        addSubViews(to: locationView, subviews: locationViews)
+        locationView.addSubviews(locationImageView, locationLabel)
         
         // add labels to stack view
         let labels = [usernameLabel, nameLabel, locationView]
@@ -71,8 +76,7 @@ class GFUserInfoHeaderVC: UIViewController {
         labelsStackview.spacing = 8
                 
         // add subviews to view
-        let subviews = [avatarImageView, labelsStackview, bioLabel]
-        addSubViews(to: view, subviews: subviews)
+        view.addSubviews(avatarImageView, labelsStackview, bioLabel)
         
         let padding = 20.0
         let middleSpacing = 12.0

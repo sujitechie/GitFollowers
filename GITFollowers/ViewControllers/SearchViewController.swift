@@ -20,7 +20,6 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        searchTextField.text = "sallen0400"
         configureLogoView()
         configureSearchTextField()
         configureGetFollowersButton()
@@ -30,12 +29,11 @@ class SearchViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
+        searchTextField.text = ""
     }
     
-
-    
     func createDismissKeyboardTapGesture() {
-        let tap = UITapGestureRecognizer(target: self.view, action: #selector(UIView.endEditing(_:)))
+        let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing(_:)))
         view.addGestureRecognizer(tap)
     }
     
@@ -47,14 +45,14 @@ class SearchViewController: UIViewController {
             presentAlertVCOnMainThread(alertTitle: "Empty Username", alertBody: "username is required to search the followers.", buttonTitle: "Ok")
             return
         }
-        let followersVC = FollowersListViewController()
-        followersVC.username = searchTextField.text
-        followersVC.title = searchTextField.text
+        
+        searchTextField.resignFirstResponder()
+        let followersVC = FollowersListViewController(username: searchTextField.text!)
         navigationController?.pushViewController(followersVC, animated: true)
     }
     
     func configureLogoView() {
-        logoImageView.image = UIImage(named: "gh-logo")
+        logoImageView.image = Images.ghLogo
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoImageView)
         NSLayoutConstraint.activate([

@@ -8,19 +8,20 @@
 import UIKit
 
 protocol UserInfoVCDelegate: AnyObject {
-    func didTapGithubProfile(user: User)
-    func didTapGetFollowers(user: User)
+    func didRequestFollowers(username: String)
 }
 
 class UserInfoViewController: UIViewController {
     
     var userName: String!
+    let scrollView: UIScrollView = UIScrollView(frame: .zero)
+    let contentView: UIView = UIView()
     let headerView: UIView = UIView()
     let itemViewOne: UIView = UIView()
     let itemViewTwo: UIView = UIView()
     let dateLabel = GFBodyLabel(textAlignment: .center)
     
-    weak var delegate: FollowersListVCDelegate?
+    weak var delegate: UserInfoVCDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +55,16 @@ class UserInfoViewController: UIViewController {
         self.add(childVC: repoItemVC, to: self.itemViewOne)
         self.add(childVC: followerItemVC, to: self.itemViewTwo)
         self.dateLabel.text = "Since \(user.createdAt.convertToDispalyFormat())"
+        
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        scrollView.pinToEdges(view)
+        contentView.pinToEdges(scrollView)
+        
+        NSLayoutConstraint.activate([
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: 600)
+        ])
     }
     
     private func configureVC() {
@@ -63,29 +74,29 @@ class UserInfoViewController: UIViewController {
     }
     
     private func layoutUI() {
-        let views = [headerView, itemViewOne, itemViewTwo, dateLabel]
-        addSubViews(to: view, subviews: views)
+
+        contentView.addSubviews(headerView, itemViewOne, itemViewTwo, dateLabel)
         let padding = 20.0
         
         NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            headerView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 180),
             
             itemViewOne.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: padding),
-            itemViewOne.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            itemViewOne.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            itemViewOne.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            itemViewOne.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             itemViewOne.heightAnchor.constraint(equalToConstant: 140),
             
             itemViewTwo.topAnchor.constraint(equalTo: itemViewOne.bottomAnchor, constant: padding),
-            itemViewTwo.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            itemViewTwo.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            itemViewTwo.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            itemViewTwo.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             itemViewTwo.heightAnchor.constraint(equalToConstant: 140),
             
             dateLabel.topAnchor.constraint(equalTo: itemViewTwo.bottomAnchor, constant: padding),
-            dateLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-            dateLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: padding),
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -padding),
             dateLabel.heightAnchor.constraint(equalToConstant: 18),
         ])
     }
@@ -104,7 +115,7 @@ class UserInfoViewController: UIViewController {
     
 }
 
-extension UserInfoViewController: UserInfoVCDelegate {
+extension UserInfoViewController: ItemInfoVCDelegate {
     
     func didTapGithubProfile(user: User) {
         guard let url = URL(string: user.htmlUrl) else {

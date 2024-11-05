@@ -19,34 +19,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowscene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: windowscene.coordinateSpace.bounds)
         window?.windowScene = windowscene
-        
-        window?.rootViewController = createTabBar()
+        window?.rootViewController = GFTabBarController()
         window?.makeKeyAndVisible()
     }
     
-    private func createTabBar() -> UITabBarController {
-        let tabbar = UITabBarController()
-        UITabBar.appearance().tintColor = .systemGreen
-        tabbar.tabBar.backgroundColor = .secondarySystemBackground
-        tabbar.viewControllers = [createSearchNC(), createFavouritesNC()]
-        
-        return tabbar
-    }
-    
-    private func createSearchNC() -> UINavigationController {
-        let searchVC = SearchViewController()
-        searchVC.title = "search"
-        searchVC.tabBarItem = UITabBarItem(tabBarSystemItem: .search, tag: 0)
-        return UINavigationController(rootViewController: searchVC)
-    }
-    
-    private func createFavouritesNC() -> UINavigationController {
-        let favouritesVC = FavouritesListViewController()
-        favouritesVC.title = "favourites"
-        favouritesVC.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 1)
-        return UINavigationController(rootViewController: favouritesVC)
-    }
-
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.
