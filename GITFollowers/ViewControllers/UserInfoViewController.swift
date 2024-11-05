@@ -55,16 +55,7 @@ class UserInfoViewController: UIViewController {
         self.add(childVC: repoItemVC, to: self.itemViewOne)
         self.add(childVC: followerItemVC, to: self.itemViewTwo)
         self.dateLabel.text = "Since \(user.createdAt.convertToDispalyFormat())"
-        
-        view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
-        scrollView.pinToEdges(view)
-        contentView.pinToEdges(scrollView)
-        
-        NSLayoutConstraint.activate([
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-            contentView.heightAnchor.constraint(equalToConstant: 600)
-        ])
+
     }
     
     private func configureVC() {
@@ -74,8 +65,20 @@ class UserInfoViewController: UIViewController {
     }
     
     private func layoutUI() {
+        
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        scrollView.pinToEdges(view)
+        contentView.pinToEdges(scrollView)
+        
+        NSLayoutConstraint.activate([
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            contentView.heightAnchor.constraint(equalToConstant: 800)
+        ])
 
         contentView.addSubviews(headerView, itemViewOne, itemViewTwo, dateLabel)
+        
         let padding = 20.0
         
         NSLayoutConstraint.activate([
