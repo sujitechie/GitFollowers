@@ -22,6 +22,17 @@ class FollowerCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        avatarView.image = nil
+        usernameLabel.text = ""
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        avatarView.image = nil
+        usernameLabel.text = ""
+    }
+    
     func set(follower: Follower) {
         usernameLabel.text = follower.login
         NetworkManager.shared.downloadImage(from: follower.avatarUrl) { [weak self] image in

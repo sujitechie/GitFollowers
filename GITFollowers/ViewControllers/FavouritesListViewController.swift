@@ -98,6 +98,10 @@ extension FavouritesListViewController: UITableViewDelegate, UITableViewDataSour
             guard let error = error else { return }
             self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
         }
+        
+        if favourites.isEmpty {
+            showEmptyStateView(with: "No Favourites \n Add from followers screen.", on: self.view)
+        } 
     }
 
 }

@@ -20,6 +20,20 @@ extension UIViewController {
         }
     }
     
+    func presentAlertVC(alertTitle: String, alertBody: String, buttonTitle: String) {
+        let alertVC = GFAlertVC(alertTitle: alertTitle, alertBody: alertBody, buttonTitle: buttonTitle)
+        alertVC.modalPresentationStyle = .overFullScreen
+        present(alertVC, animated: true)
+    }
+    
+    func presentDefaultError() {
+        let alertVC = GFAlertVC(alertTitle: "Something went wrong",
+                                alertBody: "Unable to process your request. please try again.",
+                                buttonTitle: "Ok")
+        alertVC.modalPresentationStyle = .overFullScreen
+        present(alertVC, animated: true)
+    }
+    
     func showLoadingIndicatior() {
         loadingView = UIView(frame: view.bounds)
         loadingView.alpha = 0

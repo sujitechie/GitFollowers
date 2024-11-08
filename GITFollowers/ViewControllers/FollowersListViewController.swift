@@ -57,11 +57,9 @@ class FollowersListViewController: UIViewController {
     @objc func addButtonTapped() {
         showLoadingIndicatior()
         
-        NetworkManager.shared.getUserInfo(userName: username) { [weak self] result in
-            guard let self = self else { return }
-            self.hideLoadingIndicator()
-            switch result {
-            case .success(let user):
+        Task {
+            do {
+                let user = try await NetworkManager.shared.getUserInfo(userName: username)
                 let favourite = Follower(login: user.login, avatarUrl: user.avatarUrl)
                 PersistenceManager.updateWith(favourite: favourite, actionType: .add) { [weak self] error in
                     guard let self = self else { return }
@@ -71,10 +69,36 @@ class FollowersListViewController: UIViewController {
                     }
                     self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
                 }
-            case .failure(let error):
-                self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+                hideLoadingIndicator()
+            } catch {
+                if let error = error as? GFError {
+                    self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+                } else {
+                    self.presentDefaultError()
+                }
+                hideLoadingIndicator()
             }
         }
+        
+//        old network call to fetch user info
+//        NetworkManager.shared.getUserInfo(userName: username) { [weak self] result in
+//            guard let self = self else { return }
+//            self.hideLoadingIndicator()
+//            switch result {
+//            case .success(let user):
+//                let favourite = Follower(login: user.login, avatarUrl: user.avatarUrl)
+//                PersistenceManager.updateWith(favourite: favourite, actionType: .add) { [weak self] error in
+//                    guard let self = self else { return }
+//                    guard let error = error else {
+//                        self.presentAlertVCOnMainThread(alertTitle: "Success", alertBody: "User added to favourites🎉🎉", buttonTitle: "Ok")
+//                        return
+//                    }
+//                    self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+//                }
+//            case .failure(let error):
+//                self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+//            }
+//        }
     }
     
     func configureCollectionView() {
@@ -112,13 +136,11 @@ class FollowersListViewController: UIViewController {
 
     func getFollowers(username: String, page: Int) {
         showLoadingIndicatior()
-        NetworkManager.shared.getFollowers(userName: username, page: page) {
-            [weak self] result in
-            self?.hideLoadingIndicator()
-            guard let self = self else { return }
-
-            switch result {
-            case .success(let followers):
+        
+        Task {
+            do {
+                
+                let followers = try await NetworkManager.shared.getFollowers(userName: username, page: page)
                 if followers.count < 100 {
                     hasMoreFollowers = false
                 }
@@ -126,16 +148,48 @@ class FollowersListViewController: UIViewController {
                 
                 if followers.isEmpty {
                     let message = "This user does not have any followers."
-                    DispatchQueue.main.async {
-                        self.showEmptyStateView(with: message, on: self.view)
-                    }
+                    showEmptyStateView(with: message, on: view)
                 }
+                updateData(with: self.followers)
+                hideLoadingIndicator()
                 
-                self.updateData(with: self.followers)
-            case .failure(let errorMessage):
-                self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: errorMessage.rawValue, buttonTitle: "Ok")
+            } catch {
+                if let error = error as? GFError {
+                    presentAlertVC(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+                } else {
+                    presentDefaultError()
+                }
+                hideLoadingIndicator()
             }
         }
+        
+        
+        
+//        Calling network magager using old way of completion handlers
+//        NetworkManager.shared.getFollowers(userName: username, page: page) {
+//            [weak self] result in
+//            self?.hideLoadingIndicator()
+//            guard let self = self else { return }
+//
+//            switch result {
+//            case .success(let followers):
+//                if followers.count < 100 {
+//                    hasMoreFollowers = false
+//                }
+//                self.followers.append(contentsOf: followers)
+//                
+//                if followers.isEmpty {
+//                    let message = "This user does not have any followers."
+//                    DispatchQueue.main.async {
+//                        self.showEmptyStateView(with: message, on: self.view)
+//                    }
+//                }
+//                
+//                self.updateData(with: self.followers)
+//            case .failure(let errorMessage):
+//                self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: errorMessage.rawValue, buttonTitle: "Ok")
+//            }
+//        }
     }
 }
 

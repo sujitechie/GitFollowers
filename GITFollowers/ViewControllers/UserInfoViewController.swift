@@ -31,18 +31,35 @@ class UserInfoViewController: UIViewController {
     }
     
     private func getUserInfo() {
-        NetworkManager.shared.getUserInfo(userName: userName) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let user):
-                
-                DispatchQueue.main.async {
-                    self.configureUI(with: user)
+        showLoadingIndicatior()
+        Task {
+            do {
+                let user = try await NetworkManager.shared.getUserInfo(userName: userName)
+                configureUI(with: user)
+                hideLoadingIndicator()
+            } catch {
+                if let error = error as? GFError {
+                    self.presentAlertVCOnMainThread(alertTitle: "Something went wrong", alertBody: error.rawValue, buttonTitle: "Ok")
+                } else {
+                    self.presentDefaultError()
                 }
-            case .failure(let error):
-                print(error)
+                hideLoadingIndicator()
             }
         }
+        
+//        old network call
+//        NetworkManager.shared.getUserInfo(userName: userName) { [weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case .success(let user):
+//                
+//                DispatchQueue.main.async {
+//                    self.configureUI(with: user)
+//                }
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
     
     private func configureUI(with user: User) {
